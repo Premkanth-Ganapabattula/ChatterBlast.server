@@ -11,6 +11,7 @@ const WebSocket = require('ws');
 const cron = require('node-cron');
 const {OpenAI} = require('openai');
 const axios = require('axios');
+const mimeTypes = require('mime-types');
 require('dotenv').config();
 process.env.OPENAI_API_KEY = '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';
 const fs = require('fs');
@@ -223,12 +224,13 @@ app.get('/user/details/:userId', authenticateToken, async(request, response) => 
 
 app.get('/profile/photo/stream/:filename', (request, response) => {
   const filename = request.params.filename;
-  if (filename !== undefined || filename !== null) {
   const filePath = path.join(__dirname, 'uploads/', filename);
 
   const stat = fs.statSync(filePath);
   const fileSize = stat.size;
   const range = request.headers.range;
+
+  const contentType = mimeTypes.lookup(filePath) || 'application/octet-stream';
 
   if (range) {
     const parts = range.replace(/bytes=/, "").split("-");
@@ -241,7 +243,7 @@ app.get('/profile/photo/stream/:filename', (request, response) => {
       'Content-Range': `bytes ${start}-${end}/${fileSize}`,
       'Accept-Ranges': 'bytes',
       'Content-Length': chunkSize,
-      'Content-Type': 'video/mp4',
+      'Content-Type': contentType,
     };
 
     response.writeHead(206, headers);
@@ -249,12 +251,11 @@ app.get('/profile/photo/stream/:filename', (request, response) => {
   } else {
     const headers = {
       'Content-Length': fileSize,
-      'Content-Type': 'video/mp4',
+      'Content-Type': contentType,
     };
 
     response.writeHead(200, headers);
     fs.createReadStream(filePath).pipe(response);
-  }
   }
 });
 
@@ -266,6 +267,8 @@ app.get('/posts/stream/:filename', (request, response) => {
   const fileSize = stat.size;
   const range = request.headers.range;
 
+  const contentType = mimeTypes.lookup(filePath) || 'application/octet-stream';
+
   if (range) {
     const parts = range.replace(/bytes=/, "").split("-");
     const start = parseInt(parts[0], 10);
@@ -277,7 +280,7 @@ app.get('/posts/stream/:filename', (request, response) => {
       'Content-Range': `bytes ${start}-${end}/${fileSize}`,
       'Accept-Ranges': 'bytes',
       'Content-Length': chunkSize,
-      'Content-Type': 'video/mp4',
+      'Content-Type': contentType,
     };
 
     response.writeHead(206, headers);
@@ -285,7 +288,7 @@ app.get('/posts/stream/:filename', (request, response) => {
   } else {
     const headers = {
       'Content-Length': fileSize,
-      'Content-Type': 'video/mp4',
+      'Content-Type': contentType,
     };
 
     response.writeHead(200, headers);

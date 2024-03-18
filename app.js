@@ -28,7 +28,7 @@ app.use(express.json())
 
 
 app.use(cors({
-  origin: 'https://prem-s-chatterblast.onrender.com/', // Allow requests from these origins
+  origin: 'https://prem-s-chatterblast.onrender.com', // Allow requests from these origins
 }));
 
 wss.on('connection', (ws) => {

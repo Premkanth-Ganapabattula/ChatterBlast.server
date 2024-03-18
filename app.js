@@ -28,7 +28,7 @@ app.use(express.json())
 
 
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:8081'], // Allow requests from these origins
+  origin: ['http://localhost:3000', 'https://prem-s-chatterblast.onrender.com/'], // Allow requests from these origins
 }));
 
 wss.on('connection', (ws) => {

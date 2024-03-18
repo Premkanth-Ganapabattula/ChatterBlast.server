@@ -28,7 +28,7 @@ app.use(express.json())
 
 
 app.use(cors({
-  origin: ['http://localhost:3000', 'https://prem-s-chatterblast.onrender.com/'], // Allow requests from these origins
+  origin: 'https://prem-s-chatterblast.onrender.com/', // Allow requests from these origins
 }));
 
 wss.on('connection', (ws) => {
@@ -41,8 +41,12 @@ wss.on('error', (error) => {
   console.error('WebSocket server error:', error);
 });
 
-
-
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', 'https://prem-s-chatterblast.onrender.com');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  next();
+});
 
 const storage = multer.diskStorage({
   destination: 'uploads/',
